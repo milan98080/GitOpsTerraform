@@ -20,7 +20,7 @@ resource "aws_s3_bucket" "frontend_dist" {
 }
 
 resource "aws_s3_bucket_versioning" "frontend_dist_versioning" {
-  bucket = aws_s3_bucket.frontend_dist.bucket.id
+  bucket = aws_s3_bucket.frontend_dist.id
   versioning_configuration {
     status = "Enabled"
   }
@@ -28,12 +28,12 @@ resource "aws_s3_bucket_versioning" "frontend_dist_versioning" {
 
 resource "aws_s3_bucket_object_lock_configuration" "frontend_dist_lock" {
   depends_on          = [aws_s3_bucket.frontend_dist]
-  bucket              = aws_s3_bucket.frontend_dist.bucket.id
+  bucket              = aws_s3_bucket.frontend_dist.id
   object_lock_enabled = "Enabled"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "frontend_dist_encryption" {
-  bucket = aws_s3_bucket.frontend_dist.bucket.id
+  bucket = aws_s3_bucket.frontend_dist.id
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "aws:kms"
