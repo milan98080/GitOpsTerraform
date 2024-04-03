@@ -28,7 +28,7 @@ jobs:
     steps:
       - name: Set environment
         run: |
-          branch_ref=$ {{ github.base_ref }}
+          branch_ref= ${{ github.base_ref }}
           if [[ $branch_ref == 'main' ]] || ${{ contains(github.event.inputs.environment, 'prod') }}; then
             echo "env_name=prod" >> $GITHUB_ENV
           else
