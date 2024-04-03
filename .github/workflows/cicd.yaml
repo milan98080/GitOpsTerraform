@@ -102,6 +102,7 @@ jobs:
           aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: "milan-s3-frontend-bucket-${needs.resolve-environment.outputs.env_name}"
+          source_dir: './frontend/dist'
 
       - name: Setup semver bash
         run: |
