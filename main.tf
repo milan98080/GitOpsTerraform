@@ -33,6 +33,10 @@ resource "aws_s3_bucket_ownership_controls" "owner" {
   }
 }
 
+data "aws_canonical_user_id" "current" {
+  provider = aws
+}
+
 resource "aws_s3_bucket_acl" "example" {
   depends_on = [aws_s3_bucket_ownership_controls.owner]
 
