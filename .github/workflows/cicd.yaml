@@ -23,19 +23,19 @@ on:
       - dev
 
 jobs:
-  resolve-environtment:
+  resolve-env:
     runs-on: ubuntu-latest
     steps:
-      - name: Set environment
+      - name: resolve environment
         run: |
-          branch_ref= ${{ github.base_ref }}
-          if [[ $branch_ref == 'main' ]] || ${{ contains(github.event.inputs.environment, 'prod') }}; then
+          branch_ref=${{ github.base_ref }}
+          if [[ "$branch_ref" == "main" ]] || ${{ contains(github.event.inputs.environment, 'prod') }}; then
             echo "env_name=prod" >> $GITHUB_ENV
           else
-            echo  "env_name=dev" >> $GITHUB_ENV
+            echo "env_name=dev" >> $GITHUB_ENV
           fi
     outputs:
-      env_name: ${{ env.env_name }}
+      env_name: '${{ env.env_name }}'
 
   build:
     name: Checkout Terraform Plan, Build and Test and Deploy Frontend
