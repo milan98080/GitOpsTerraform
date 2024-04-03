@@ -95,13 +95,13 @@ jobs:
           npm install
           npm run build
 
-      - name: Deploy Frontend to S3
-        run: |
-          aws s3 sync build/ s3://$BUCKET_NAME
-        env:
-          BUCKET_NAME: "milan-s3-frontend-bucket-${{ needs.resolve-environment.outputs.env_name }}"
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Upload S3
+        uses: shallwefootball/s3-upload-action@master
+        id: S3
+        with:
+          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws_bucket: "milan-s3-frontend-bucket-${needs.resolve-environment.outputs.env_name}"
 
       - name: Setup semver bash
         run: |
