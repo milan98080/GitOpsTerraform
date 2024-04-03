@@ -27,8 +27,8 @@ resource "aws_s3_bucket_versioning" "frontend_dist_versioning" {
 }
 
 resource "aws_s3_bucket_object_lock_configuration" "frontend_dist_lock" {
-  depends_on = [ aws_s3_bucket.frontend_dist ]
-  bucket = aws_s3_bucket.frontend_dist.bucket.id
+  depends_on          = [aws_s3_bucket.frontend_dist]
+  bucket              = aws_s3_bucket.frontend_dist.bucket.id
   object_lock_enabled = "Enabled"
 }
 
