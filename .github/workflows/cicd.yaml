@@ -23,7 +23,7 @@ on:
       - dev
 
 jobs:
-  resolve-env:
+  resolve-environment:
     runs-on: ubuntu-latest
     steps:
       - name: resolve environment
