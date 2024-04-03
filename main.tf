@@ -7,7 +7,7 @@ terraform {
     bucket         = "milan-s3-tf-state"
     key            = "terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "milan-dynamodb-tf-lock"
+    dynamodb_table = "milan-tf-lockfile"
   }
 }
 
