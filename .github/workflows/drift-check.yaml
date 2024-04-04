@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      TF_IN_AUTOMATION: true
 
     steps:
       - name: Checkout
