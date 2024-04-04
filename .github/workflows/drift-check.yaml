@@ -1,4 +1,4 @@
-name: Infrastructure and Frontend CI/CD
+name: Drift Check
 
 on:
   schedule:
