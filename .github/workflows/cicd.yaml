@@ -95,14 +95,19 @@ jobs:
           npm install
           npm run build
 
+      - name: Configure AWS credentials
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: "us-east-1"
+        run: |
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+          aws configure set default.region $AWS_DEFAULT_REGION
+
       - name: Upload S3
-        uses: shallwefootball/s3-upload-action@master
-        id: S3
-        with:
-          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-          aws_bucket: "milan-s3-frontend-bucket-${{ needs.resolve-environment.outputs.env_name }}"
-          source_dir: './frontend/dist'
+        run: |
+          aws s3 cp frontend/dist s3://milan-s3-frontend-bucket-${{ needs.resolve-environment.outputs.env_name }} --recursive
 
       - name: Setup semver bash
         run: |
