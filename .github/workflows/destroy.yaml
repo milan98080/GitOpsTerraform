@@ -1,4 +1,4 @@
-name: Drift Check
+name: Destroy Infrastructure
 
 on:
   workflow_dispatch:
