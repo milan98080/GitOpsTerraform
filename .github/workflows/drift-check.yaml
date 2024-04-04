@@ -37,7 +37,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Terraform plan
-        id: plan
+        id: plan_dev
         run: |
           PLAN_OUTPUT=$(terraform plan)
           echo "$PLAN_OUTPUT"  # Output plan for reference
@@ -51,7 +51,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Terraform apply
-        if: steps.plan.outputs.drift-detected == 'true'
+        if: steps.plan_dev.outputs.drift-detected == 'true'
         run: |
           retries=5
           until terraform apply --auto-approve || [ $retries -eq 0 ]
