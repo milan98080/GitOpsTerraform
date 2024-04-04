@@ -1,0 +1,100 @@
+name: Drift Check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  drift-check:
+    name: Checkout Terraform Plan and Apply if Drift Detected
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform init
+        run: terraform init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Go to dev workspace
+        run: |
+          terraform workspace select -or-create dev
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Terraform plan
+        id: plan_dev
+        run: |
+          PLAN_OUTPUT=$(terraform plan)
+          echo "$PLAN_OUTPUT"  # Output plan for reference
+          if [[ $(echo "$PLAN_OUTPUT" | grep -c "No changes") -eq 0 ]]; then
+            echo "::set-output name=drift-detected::true"
+          else
+            echo "::set-output name=drift-detected::false"
+          fi
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Terraform apply
+        if: steps.plan_dev.outputs.drift-detected == 'true'
+        run: |
+          retries=5
+          until terraform apply --auto-approve || [ $retries -eq 0 ]
+          do
+            sleep 10
+            retries=$((retries-1))
+          done
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Switch to prod workspace
+        run: |
+          terraform workspace select -or-create prod
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Terraform plan
+        id: plan
+        run: |
+          PLAN_OUTPUT=$(terraform plan)
+          echo "$PLAN_OUTPUT"  # Output plan for reference
+          if [[ $(echo "$PLAN_OUTPUT" | grep -c "No changes") -eq 0 ]]; then
+            echo "::set-output name=drift-detected::true"
+          else
+            echo "::set-output name=drift-detected::false"
+          fi
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Terraform apply
+        if: steps.plan.outputs.drift-detected == 'true'
+        run: |
+          retries=5
+          until terraform apply --auto-approve || [ $retries -eq 0 ]
+          do
+            sleep 10
+            retries=$((retries-1))
+          done
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
